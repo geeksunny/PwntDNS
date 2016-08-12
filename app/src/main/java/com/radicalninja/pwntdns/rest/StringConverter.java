@@ -1,4 +1,4 @@
-package com.radicalninja.pwntdns.rest.ip;
+package com.radicalninja.pwntdns.rest;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
