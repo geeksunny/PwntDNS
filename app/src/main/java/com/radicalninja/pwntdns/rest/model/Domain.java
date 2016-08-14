@@ -2,7 +2,7 @@ package com.radicalninja.pwntdns.rest.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 
 public class Domain {
 

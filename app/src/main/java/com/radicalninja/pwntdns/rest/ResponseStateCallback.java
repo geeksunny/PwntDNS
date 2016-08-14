@@ -1,9 +1,10 @@
 package com.radicalninja.pwntdns.rest;
 
-import com.sun.istack.internal.Nullable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import javax.annotation.Nullable;
 
 public abstract class ResponseStateCallback<T> implements Callback<T> {
 
