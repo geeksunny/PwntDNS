@@ -13,7 +13,7 @@ public class Ipify {
     private RestAdapter<Client> adapter;
 
     private interface Client {
-        @GET
+        @GET(API_URL)
         Call<String> queryIpAddress();
     }
 
