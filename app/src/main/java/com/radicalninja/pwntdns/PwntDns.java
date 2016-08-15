@@ -1,5 +1,6 @@
 package com.radicalninja.pwntdns;
 
+import com.radicalninja.pwntdns.rest.api.Dnsimple;
 import com.radicalninja.pwntdns.rest.api.Ipify;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -7,7 +8,7 @@ import retrofit2.Response;
 
 public class PwntDns {
 
-
+    private Dnsimple dnsimple;
     private Ipify ipify;
 
 
@@ -18,11 +19,13 @@ public class PwntDns {
 
     private PwntDns() {
         ipify = new Ipify();
+        dnsimple = new Dnsimple();
     }
 
     private void startPwning() {
         System.out.println("Commencing DNS Pwning Operations.");
-        ipify.queryIpAddress(ipCallback);
+//        ipify.queryIpAddress(ipCallback);
+
     }
 
     private Callback<String> ipCallback = new Callback<String>() {

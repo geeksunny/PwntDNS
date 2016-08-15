@@ -40,4 +40,9 @@ public class Dnsimple {
     public class Header {
         // TODO: Use this class for the required headers features mentioned above.
     }
+
+    public void getDomainsList() {
+//        adapter.getClient().getDomainsList();
+    }
+
 }
