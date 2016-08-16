@@ -1,5 +1,8 @@
 package com.radicalninja.pwntdns;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import com.radicalninja.pwntdns.rest.api.Dnsimple;
 import com.radicalninja.pwntdns.rest.api.Ipify;
 import com.radicalninja.pwntdns.rest.model.Responses;
@@ -7,15 +10,54 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.List;
+
 public class PwntDns {
+
+    private static final String CONFIG_FILE_NAME = "./config.json";
+
+    private static Configuration config;
 
     private Dnsimple dnsimple;
     private Ipify ipify;
 
 
     public static void main(String[] args) {
+        // Read in configuration file
+        final boolean ready = loadConfig();
         // Start main task
+        if (!ready) {
+            // TODO: Kill app here
+            System.out.println("Error loading configuration! Exiting...");
+            return;
+        }
         new PwntDns().startPwning();
+    }
+
+    private static boolean loadConfig() {
+        try {
+            final Gson gson = new Gson();
+            final FileReader reader = new FileReader(CONFIG_FILE_NAME);
+            config = gson.fromJson(reader, Configuration.class);
+            return true;
+        } catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String getApiKey() {
+        return config.getApiCredentials().getDnsimpleApiKey();
+    }
+
+    public static String getUserId() {
+        return config.getApiCredentials().getDnsimpleUserId();
+    }
+
+    public static List<Configuration.Record> getUserDnsRecords() {
+        return config.getRecords();
     }
 
     private PwntDns() {

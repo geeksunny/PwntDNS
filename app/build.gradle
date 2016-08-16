@@ -1,26 +1,16 @@
-project.version '1.0-SNAPSHOT'
+project.version "1.0-SNAPSHOT"
 
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: "de.fuerstenau.buildconfig"
+apply plugin: "java"
+apply plugin: "application"
 apply plugin: "com.github.johnrengelman.shadow"
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.7
 
-mainClassName =  'com.radicalninja.pwntdns.PwntDns'
-
-buildConfig {
-    appName = "PwntDNS"
-    packageName = "com.radicalninja.pwntdns"
-    // API Credentials
-    // TODO: Move API credentials out to user config file
-    buildConfigField("String", "DNSIMPLE_API_KEY", project.dnsimple_api_token)
-    buildConfigField("String", "DNSIMPLE_USER_ID", project.dnsimple_user_id)
-}
+mainClassName =  "com.radicalninja.pwntdns.PwntDns"
 
 dependencies {
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.google.code.findbugs:jsr305:3.0.1'
+    compile "com.squareup.okhttp3:okhttp:3.4.1"
+    compile "com.squareup.retrofit2:retrofit:2.1.0"
+    compile "com.squareup.retrofit2:converter-gson:2.1.0"
+    compile "com.google.code.findbugs:jsr305:3.0.1"
 }

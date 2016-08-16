@@ -54,7 +54,7 @@ public class DnsResponse<T extends DnsResponse.ResponseModel> {
                     } else {
                         final DnsResponse response = (DnsResponse) TypeToken.get(typeOfT).getRawType().newInstance();
                         //noinspection unchecked
-                        response.setResponseBody(context.deserialize(json, response.getResponseType()));
+                        response.setResponseBody((ResponseModel) context.deserialize(json, response.getResponseType()));
                         response.setSuccess(true);
                         return response;
                     }

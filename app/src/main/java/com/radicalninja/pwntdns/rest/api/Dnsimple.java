@@ -2,10 +2,10 @@ package com.radicalninja.pwntdns.rest.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.radicalninja.pwntdns.BuildConfig;
+import com.radicalninja.pwntdns.PwntDns;
 import com.radicalninja.pwntdns.rest.RestAdapter;
-import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 import com.radicalninja.pwntdns.rest.model.Responses;
+import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -36,7 +36,7 @@ public class Dnsimple {
     }
 
     private void setupDefaultHeaders() {
-        final String tokenString = String.format("Bearer %s", BuildConfig.DNSIMPLE_API_KEY);
+        final String tokenString = String.format("Bearer %s", PwntDns.getApiKey());
         adapter.addHeader("Authorization", tokenString);
         adapter.addHeader("Accept", "application/json");
         adapter.addHeader("Content-Type", "application/json");
@@ -48,7 +48,7 @@ public class Dnsimple {
     }
 
     public void getDomainsList(final Callback<Responses.DomainsListResponse> callback) {
-        adapter.getClient().getDomainsList(BuildConfig.DNSIMPLE_USER_ID).enqueue(callback);
+        adapter.getClient().getDomainsList(PwntDns.getUserId()).enqueue(callback);
     }
 
 }
