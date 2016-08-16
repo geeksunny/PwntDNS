@@ -53,13 +53,12 @@ public class DnsResponse<T extends DnsResponse.ResponseModel> {
                         return new DnsResponse(errorMessage);
                     } else {
                         final DnsResponse response = (DnsResponse) TypeToken.get(typeOfT).getRawType().newInstance();
-                        response.setResponseBody((ResponseModel) context.deserialize(json, response.getResponseType()));
+                        //noinspection unchecked
+                        response.setResponseBody(context.deserialize(json, response.getResponseType()));
                         response.setSuccess(true);
                         return response;
                     }
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
