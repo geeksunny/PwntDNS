@@ -10,7 +10,7 @@ public class Responses {
         -H 'Accept: application/json' \
         https://api.dnsimple.com/v2/1010/domains
      */
-    public static class DomainsListResponse extends DnsPaginatedListResponse<Domain> { }
+    public static class DomainsListResponse extends DnsPaginatedListResponse<DnsDomain> { }
 
     /*
     curl  -H 'Authorization: Bearer <token>' \
@@ -20,14 +20,14 @@ public class Responses {
       -d '<json>' \
       https://api.dnsimple.com/v2/1010/domains
      */
-    public static class CreateDomainResponse extends DnsItemResponse<Domain> { }
+    public static class CreateDomainResponse extends DnsItemResponse<DnsDomain> { }
 
     /*
     curl  -H 'Authorization: Bearer <token>' \
       -H 'Accept: application/json' \
       https://api.dnsimple.com/v2/1010/domains/[example.com | 1]
      */
-    public static class GetDomainResponse extends DnsItemResponse<Domain> { }
+    public static class GetDomainResponse extends DnsItemResponse<DnsDomain> { }
 
     /*
     curl  -H 'Authorization: Bearer <token>' \
@@ -46,6 +46,6 @@ public class Responses {
       -d '{}' \
       https://api.dnsimple.com/v2/1010/domains/example.com/token
      */
-    public static class ResetDomainTokenResponse extends DnsItemResponse<Domain> { }
+    public static class ResetDomainTokenResponse extends DnsItemResponse<DnsDomain> { }
 
 }

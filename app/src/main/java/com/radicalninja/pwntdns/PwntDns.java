@@ -12,7 +12,6 @@ import retrofit2.Response;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.List;
 
 public class PwntDns {
 
@@ -56,9 +55,9 @@ public class PwntDns {
         return config.getApiCredentials().getDnsimpleUserId();
     }
 
-    public static List<Configuration.Record> getUserDnsRecords() {
-        return config.getRecords();
-    }
+//    public static Configuration.DomainRecordMap getDomainConfigMap() {
+//        return config.getDomainRecordMap();
+//    }
 
     private PwntDns() {
         ipify = new Ipify();
