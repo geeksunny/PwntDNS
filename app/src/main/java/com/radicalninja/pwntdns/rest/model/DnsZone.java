@@ -2,13 +2,13 @@ package com.radicalninja.pwntdns.rest.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class DnsDomain {
+public class DnsZone {
 
     public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -20,35 +20,10 @@ public class DnsDomain {
     private int accountId;
 
     @Expose
-    @SerializedName("registrant_id")
-    @Nullable
-    private Integer registrantId;
-
-    @Expose
     private String name;
 
     @Expose
-    @SerializedName("unicode_name")
-    private String unicodeName;
-
-    @Expose
-    private String token;
-
-    @Expose
-    // TODO: enum for this field?
-    private String state;
-
-    @Expose
-    @SerializedName("auto_renew")
-    private boolean autoRenew;
-
-    @Expose
-    @SerializedName("private_whois")
-    private boolean privateWhois;
-
-    @Expose
-    @SerializedName("expires_on")
-    private String expiresOn;
+    private boolean reverse;
 
     @Expose
     @SerializedName("created_at")
@@ -66,39 +41,12 @@ public class DnsDomain {
         return accountId;
     }
 
-    @Nullable
-    public Integer getRegistrantId() {
-        return registrantId;
-    }
-
     public String getName() {
         return name;
     }
 
-    public String getUnicodeName() {
-        return unicodeName;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public boolean isAutoRenew() {
-        return autoRenew;
-    }
-
-    public boolean isPrivateWhois() {
-        return privateWhois;
-    }
-
-    @Nullable
-    public String getExpiresOn() {
-        // TODO: should we add Date object parsing to this string? [2015-12-06]
-        return expiresOn;
+    public boolean isReverse() {
+        return reverse;
     }
 
     @Nullable

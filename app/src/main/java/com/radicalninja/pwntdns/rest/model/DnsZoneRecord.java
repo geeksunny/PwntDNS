@@ -2,13 +2,14 @@ package com.radicalninja.pwntdns.rest.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import javax.annotation.Nullable;
+import com.radicalninja.pwntdns.Record;
 
+import javax.annotation.Nullable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class DnsDomain {
+public class DnsZoneRecord {
 
     public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -16,39 +17,31 @@ public class DnsDomain {
     private int id;
 
     @Expose
-    @SerializedName("account_id")
-    private int accountId;
+    @SerializedName("zone_id")
+    private String zoneId;
 
     @Expose
-    @SerializedName("registrant_id")
-    @Nullable
-    private Integer registrantId;
+    @SerializedName("parent_id")
+    private Integer parentId;
 
     @Expose
     private String name;
 
     @Expose
-    @SerializedName("unicode_name")
-    private String unicodeName;
+    private String content;
 
     @Expose
-    private String token;
+    private int ttl;
 
     @Expose
-    // TODO: enum for this field?
-    private String state;
+    private Integer priority;
 
     @Expose
-    @SerializedName("auto_renew")
-    private boolean autoRenew;
+    private Record.Type type;
 
     @Expose
-    @SerializedName("private_whois")
-    private boolean privateWhois;
-
-    @Expose
-    @SerializedName("expires_on")
-    private String expiresOn;
+    @SerializedName("system_record")
+    private boolean systemRecord;
 
     @Expose
     @SerializedName("created_at")
@@ -62,43 +55,38 @@ public class DnsDomain {
         return id;
     }
 
-    public int getAccountId() {
-        return accountId;
+    public String getZoneId() {
+        return zoneId;
     }
 
     @Nullable
-    public Integer getRegistrantId() {
-        return registrantId;
+    public Integer getParentId() {
+        return parentId;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getUnicodeName() {
-        return unicodeName;
+    public String getContent() {
+        return content;
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public boolean isAutoRenew() {
-        return autoRenew;
-    }
-
-    public boolean isPrivateWhois() {
-        return privateWhois;
+    public int getTtl() {
+        return ttl;
     }
 
     @Nullable
-    public String getExpiresOn() {
-        // TODO: should we add Date object parsing to this string? [2015-12-06]
-        return expiresOn;
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public Record.Type getType() {
+        return type;
+    }
+
+    public boolean isSystemRecord() {
+        return systemRecord;
     }
 
     @Nullable
