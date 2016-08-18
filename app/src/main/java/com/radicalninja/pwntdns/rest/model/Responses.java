@@ -2,6 +2,7 @@ package com.radicalninja.pwntdns.rest.model;
 
 import com.radicalninja.pwntdns.rest.model.response.DnsItemResponse;
 import com.radicalninja.pwntdns.rest.model.response.DnsPaginatedListResponse;
+import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 
 public class Responses {
 
@@ -9,7 +10,7 @@ public class Responses {
 
     public static class CreateDomainResponse extends DnsItemResponse<DnsDomain> { }
 
-    public static class GetDomainResponse extends DnsItemResponse<DnsDomain> { }
+    public static class GetDomainResponse extends DnsResponse<DnsItemResponse<DnsDomain>> { }
 
     // TODO: DeleteDomainResponse is HTTP 204
 

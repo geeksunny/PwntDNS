@@ -25,6 +25,18 @@ public class DnsResponse<T extends DnsResponse.ResponseModel> {
         this.errorMessage = errorMessage;
     }
 
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
+    public T getResponseBody() {
+        return responseBody;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
     private Type getResponseType() {
         return new TypeToken<T>(){}.getType();
     }

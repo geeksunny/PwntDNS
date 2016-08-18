@@ -4,18 +4,19 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.radicalninja.pwntdns.PwntDns;
 import com.radicalninja.pwntdns.rest.RestAdapter;
+import com.radicalninja.pwntdns.rest.model.DnsDomain;
 import com.radicalninja.pwntdns.rest.model.Responses;
 import com.radicalninja.pwntdns.rest.model.request.DnsCreateZoneRecordRequest;
 import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Dnsimple {
 
-    // TODO: BuildConfig.DNSIMPLE_API_KEY
-    // TODO: BuildConfig.DNSIMPLE_USER_ID
     private static final String API_URL = "https://api.dnsimple.com/v2/";
 
     private final RestAdapter<Client> adapter;
@@ -47,6 +48,10 @@ public class Dnsimple {
         @GET("{accountId}/domains")
         Call<Responses.DomainsListResponse> getDomainsList(@Path("accountId") final String accountId);
 
+        @GET("{accountId}/domains/{domainName}")
+        Call<Responses.GetDomainResponse> getDomain(
+                @Path("accountId") final String accountId, @Path("domainName") final String domainName);
+
         @GET("{accountId}/zones")
         Call<Responses.GetZoneResponse> getZonesList(@Path("accountId") final String accountId);
 
@@ -70,8 +75,19 @@ public class Dnsimple {
                 @Path("recordId") final int recordId, @Body final DnsCreateZoneRecordRequest request);
     }
 
-    public void getDomainsList(final Callback<Responses.DomainsListResponse> callback) {
-        adapter.getClient().getDomainsList(PwntDns.getUserId()).enqueue(callback);
+    /**
+     * Query API synchronously for a list of domains.
+     * // TODO: This currently does not support result pagination!!
+     * @return The resulting list of domains.
+     */
+    public List<DnsDomain> getDomainsList() {
+        final Responses.DomainsListResponse response =
+                adapter.doSynchronousCall(adapter.getClient().getDomainsList(PwntDns.getUserId()));
+        return (null != response) ? response.getData() : new ArrayList<DnsDomain>();
+    }
+
+    public Responses.GetDomainResponse getDomainRecord(final String domainName) {
+        return adapter.doSynchronousCall(adapter.getClient().getDomain(PwntDns.getUserId(), domainName));
     }
 
 }
