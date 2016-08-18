@@ -20,13 +20,9 @@ public class Configuration {
         return apiCredentials;
     }
 
-//    public DomainRecordMap getDomainRecordMap() {
-//        return domainRecordMap;
-//    }
-//
-//    public void setDomainRecordMap(DomainRecordMap domainRecordMap) {
-//        this.domainRecordMap = domainRecordMap;
-//    }
+    public LinkedTreeMap<String, List<Record>> getDomainRecordMap() {
+        return domainRecordMap;
+    }
 
     public class Api {
         @Expose
@@ -43,10 +39,6 @@ public class Configuration {
         public String getDnsimpleUserId() {
             return dnsimpleUserId;
         }
-    }
-
-    public class DomainRecordMap {
-        // TODO: Add methods here for handling domain record objects
     }
 
 }

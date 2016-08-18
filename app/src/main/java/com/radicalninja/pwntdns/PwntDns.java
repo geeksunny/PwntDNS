@@ -3,12 +3,7 @@ package com.radicalninja.pwntdns;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import com.radicalninja.pwntdns.rest.api.Dnsimple;
 import com.radicalninja.pwntdns.rest.api.Ipify;
-import com.radicalninja.pwntdns.rest.model.Responses;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,7 +14,6 @@ public class PwntDns {
 
     private static Configuration config;
 
-    private Dnsimple dnsimple;
     private Ipify ipify;
 
 
@@ -61,44 +55,15 @@ public class PwntDns {
 
     private PwntDns() {
         ipify = new Ipify();
-        dnsimple = new Dnsimple();
     }
 
     private void startPwning() {
         System.out.println("Commencing DNS Pwning Operations.");
-//        ipify.queryIpAddress(ipCallback);
-        dnsimple.getDomainsList(dnsCallback);
-    }
 
-    private Callback<Responses.DomainsListResponse> dnsCallback = new Callback<Responses.DomainsListResponse>() {
-        @Override
-        public void onResponse(Call<Responses.DomainsListResponse> call, Response<Responses.DomainsListResponse> response) {
-            System.out.printf("DNS List Response: %s\n", response.body().getData().toString());
-            donePwning();
-        }
+        final String ipAddress = ipify.queryIpAddress();
+        final DomainRecordUpdater updater = new DomainRecordUpdater(ipAddress, config.getDomainRecordMap());
+        final boolean updaterWasSuccessful = updater.run();
 
-        @Override
-        public void onFailure(Call<Responses.DomainsListResponse> call, Throwable t) {
-            System.out.printf("ipCallback.onFailure! (%s, %s)\n", call.toString(), t.toString());
-            donePwning();
-        }
-    };
-
-    private Callback<String> ipCallback = new Callback<String>() {
-        @Override
-        public void onResponse(Call<String> call, Response<String> response) {
-            System.out.printf("IP address: %s\n", response.body());
-            donePwning();
-        }
-
-        @Override
-        public void onFailure(Call<String> call, Throwable t) {
-            System.out.printf("ipCallback.onFailure! (%s, %s)\n", call.toString(), t.toString());
-            donePwning();
-        }
-    };
-
-    private void donePwning() {
         System.out.println("Pwning Operation Complete.");
     }
 
