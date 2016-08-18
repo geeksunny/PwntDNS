@@ -7,8 +7,10 @@ import com.radicalninja.pwntdns.rest.RestAdapter;
 import com.radicalninja.pwntdns.rest.model.DnsDomain;
 import com.radicalninja.pwntdns.rest.model.Responses;
 import com.radicalninja.pwntdns.rest.model.request.DnsCreateZoneRecordRequest;
+import com.radicalninja.pwntdns.rest.model.request.DomainCreateRequest;
 import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.*;
 
@@ -45,6 +47,7 @@ public class Dnsimple {
     }
 
     private interface Client {
+        /* Domains */
         @GET("{accountId}/domains")
         Call<Responses.DomainsListResponse> getDomainsList(@Path("accountId") final String accountId);
 
@@ -52,6 +55,18 @@ public class Dnsimple {
         Call<Responses.GetDomainResponse> getDomain(
                 @Path("accountId") final String accountId, @Path("domainName") final String domainName);
 
+        @POST("{accountId}/domains")
+        Call<Responses.CreateDomainResponse> createDomain(
+                @Path("accountId") final String accountId, @Body final DomainCreateRequest request);
+
+        @DELETE("{accountId}/domains/{domainName}")
+        Call<Response> deleteDomain(@Path("accountId") final String accountId, @Path("domainName") final String domainName);
+
+        @POST("{accountId}/domains/{domainName}/token")
+        Call<Responses.ResetDomainTokenResponse> resetDomainToken(
+                @Path("accountId") final String accountId, @Path("domainName") final String domainName);
+
+        /* Zones */
         @GET("{accountId}/zones")
         Call<Responses.GetZoneResponse> getZonesList(@Path("accountId") final String accountId);
 
