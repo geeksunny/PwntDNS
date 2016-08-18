@@ -21,6 +21,10 @@ public class Ipify {
         adapter = new RestAdapter<>(API_URL, Client.class, new StringConverter());
     }
 
+    public String queryIpAddress() {
+        return adapter.doSynchronousCall(adapter.getClient().queryIpAddress());
+    }
+
     public void queryIpAddress(final Callback<String> callback) {
         adapter.getClient().queryIpAddress().enqueue(callback);
     }

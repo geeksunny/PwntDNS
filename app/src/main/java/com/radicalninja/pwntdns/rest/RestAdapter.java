@@ -4,9 +4,11 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import retrofit2.Call;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +64,23 @@ public class RestAdapter<T> {
         synchronized (lock) {
             requiredHeaders.clear();
         }
+    }
+
+    /**
+     * Simple method to synchronously make a call and return the resulting response body.
+     * There is no explicit error handling here other than a null response.
+     * @param call    A Call object for making your network request.
+     * @param <RT>    Your response type class.
+     * @return  Returns the response body in the response type class format, or null if there is an error.
+     */
+    @Nullable
+    public <RT> RT doSynchronousCall(final Call<RT> call) {
+        try {
+            return call.execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     class RestInterceptor implements Interceptor {
