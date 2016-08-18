@@ -1,8 +1,11 @@
 package com.radicalninja.pwntdns;
 
 import com.radicalninja.pwntdns.rest.api.Dnsimple;
+import com.radicalninja.pwntdns.rest.model.DnsZone;
+import com.radicalninja.pwntdns.rest.model.DnsZoneRecord;
 import com.radicalninja.pwntdns.rest.model.Responses;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,8 +26,11 @@ public class DomainRecordUpdater {
      * so the task can run sequentially from start to finish.
      */
     public boolean run() {
-        for (final String domain : domainRecordMap.keySet()) {
-            final boolean domainIsReady = verifyDomain(domain);
+        for (final Map.Entry<String, List<Record>> domain : domainRecordMap.entrySet()) {
+            final boolean domainIsReady = verifyDomain(domain.getKey());
+            if (domainIsReady) {
+                reviewRecords(domain.getValue());
+            }
         }
 
         return false;
@@ -37,10 +43,35 @@ public class DomainRecordUpdater {
      */
     private boolean verifyDomain(final String domainName) {
 
-        // TODO: Check domain here
         final Responses.GetDomainResponse domainRecord = dnsimple.getDomainRecord(domainName);
-        // TODO: Add in calls for creating domain if it does not exist
-        return (null != domainRecord) && (domainRecord.isSuccess());
+        if (null == domainRecord) {
+            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
+            return false;
+        }
+        return domainRecord.isSuccess() || createDomain(domainName);
+    }
+
+    private boolean createDomain(final String domainName) {
+        final Responses.CreateDomainResponse response = dnsimple.createDomain(domainName);
+        return (null != response && response.isSuccess());
+    }
+
+    private void reviewRecords(final String zoneName, final List<Record> localRecords) {
+        final List<DnsZoneRecord> remoteRecords = getRecordsForZone(zoneName);
+        for (final Record record : records) {
+
+        }
+    }
+
+    private List<DnsZoneRecord> getRecordsForZone(final String zoneName) {
+        final Responses.ZoneRecordsListResponse response = dnsimple.getZoneRecords(zoneName);
+        return (null != response && null != response.getResponseBody())
+                ? response.getResponseBody().getData()
+                : new ArrayList<DnsZoneRecord>();
+    }
+
+    private boolean checkRecord(final Record record, final String ipAddress) {
+
     }
 
     /*

@@ -22,6 +22,7 @@ public class Dnsimple {
     private static final String API_URL = "https://api.dnsimple.com/v2/";
 
     private final RestAdapter<Client> adapter;
+    private final String apiKey;
 
     // TODO: Add static map data of required headers for this particular service
     // TODO: Add an interface method for adding/subtracting any headers for a given request
@@ -34,13 +35,14 @@ public class Dnsimple {
         return new Gson();
     }
 
-    public Dnsimple() {
+    public Dnsimple(final String apiKey) {
+        this.apiKey = apiKey;
         adapter = new RestAdapter<>(API_URL, Client.class, GsonConverterFactory.create(buildGsonClient()));
         setupDefaultHeaders();
     }
 
     private void setupDefaultHeaders() {
-        final String tokenString = String.format("Bearer %s", PwntDns.getApiKey());
+        final String tokenString = String.format("Bearer %s", apiKey);
         adapter.addHeader("Authorization", tokenString);
         adapter.addHeader("Accept", "application/json");
         adapter.addHeader("Content-Type", "application/json");
@@ -98,11 +100,22 @@ public class Dnsimple {
     public List<DnsDomain> getDomainsList() {
         final Responses.DomainsListResponse response =
                 adapter.doSynchronousCall(adapter.getClient().getDomainsList(PwntDns.getUserId()));
-        return (null != response) ? response.getData() : new ArrayList<DnsDomain>();
+        return (null != response && null != response.getResponseBody())
+                ? response.getResponseBody().getData()
+                : new ArrayList<DnsDomain>();
     }
 
     public Responses.GetDomainResponse getDomainRecord(final String domainName) {
         return adapter.doSynchronousCall(adapter.getClient().getDomain(PwntDns.getUserId(), domainName));
+    }
+
+    public Responses.CreateDomainResponse createDomain(final String domainName) {
+        final DomainCreateRequest request = new DomainCreateRequest(domainName);
+        return adapter.doSynchronousCall(adapter.getClient().createDomain(PwntDns.getUserId(), request));
+    }
+
+    public Responses.ZoneRecordsListResponse getZoneRecords(final String zoneName) {
+        return adapter.doSynchronousCall(adapter.getClient().getZoneRecords(PwntDns.getUserId(), zoneName));
     }
 
 }
