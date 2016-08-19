@@ -4,31 +4,32 @@
     "user_id": "12345"
   },
   "domains": {
-    "example.com": [
-      {
-        "name": "",
-        "ttl": 86400,
-        "priority": null,
-        "type": "A"
-      },
-      {
-        "name": "www",
-        "type": "A"
-      }
-    ],
+    "example.com": {
+      "A": [
+        {
+          "name": "",
+          "ttl": 86400,
+          "priority": null
+        },
+        {
+          "name": "www"
+        }
+      ],
+      "CNAME": [
+        {
+          "sample"
+        }
+      ]
+    },
     "sample.net": [
-      {
-        "name": "",
-        "type": "A"
-      },
-      {
-        "name": "www",
-        "type": "A"
-      },
-      {
-        "name": "subdomain",
-        "type": "A"
-      }
+      "A": [
+        {
+          "name": "",
+        },
+        {
+          "name": "www"
+        }
+      ]
     ]
   }
 }

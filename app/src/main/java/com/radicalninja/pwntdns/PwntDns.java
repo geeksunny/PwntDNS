@@ -1,6 +1,6 @@
 package com.radicalninja.pwntdns;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.radicalninja.pwntdns.rest.api.Ipify;
@@ -31,9 +31,11 @@ public class PwntDns {
 
     private static boolean loadConfig() {
         try {
-            final Gson gson = new Gson();
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(
+                    Configuration.DomainConfigList.class, new Configuration.DomainConfigListDeserializer());
             final FileReader reader = new FileReader(CONFIG_FILE_NAME);
-            config = gson.fromJson(reader, Configuration.class);
+            config = gsonBuilder.create().fromJson(reader, Configuration.class);
             return true;
         } catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
             e.printStackTrace();
@@ -49,10 +51,6 @@ public class PwntDns {
         return config.getApiCredentials().getDnsimpleUserId();
     }
 
-//    public static Configuration.DomainRecordMap getDomainConfigMap() {
-//        return config.getDomainRecordMap();
-//    }
-
     private PwntDns() {
         ipify = new Ipify();
     }
@@ -61,7 +59,7 @@ public class PwntDns {
         System.out.println("Commencing DNS Pwning Operations.");
 
         final String ipAddress = ipify.queryIpAddress();
-        final DomainRecordUpdater updater = new DomainRecordUpdater(ipAddress, config.getDomainRecordMap());
+        final DomainRecordUpdater updater = new DomainRecordUpdater(ipAddress, config.getDomainConfigs());
         final boolean updaterWasSuccessful = updater.run();
 
         System.out.println("Pwning Operation Complete.");
