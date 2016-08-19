@@ -47,12 +47,11 @@ public class DomainRecordUpdater {
     private boolean verifyDomain(final String domainName) {
 
         final Responses.GetDomainResponse domainRecord = dnsimple.getDomainRecord(domainName);
-        throw new RuntimeException("OMG");
-//        if (null == domainRecord) {
-//            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
-//            return false;
-//        }
-//        return domainRecord.isSuccess() || createDomain(domainName);
+        if (null == domainRecord) {
+            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
+            return false;
+        }
+        return domainRecord.isSuccess() || createDomain(domainName);
     }
 
     private boolean createDomain(final String domainName) {
@@ -65,9 +64,12 @@ public class DomainRecordUpdater {
         for (final Map.Entry<Record.Type, List<Record>> localRecords : domainConfig.getRecords().entrySet()) {
             final Map<String, DnsZoneRecord> remoteRecords = remoteRecordsByType.get(localRecords.getKey());
             for (final Record localRecord : localRecords.getValue()) {
-                final DnsZoneRecord remoteRecord = remoteRecords.get(localRecord.getName());
+                DnsZoneRecord remoteRecord = null;
+                if (null != remoteRecords) {
+                    remoteRecord = remoteRecords.get(localRecord.getName());
+                }
                 if (null == remoteRecord) {
-                    final boolean wasCreated = createZoneRecord(domainConfig.getName(), localRecord);
+                    final boolean wasCreated = createZoneRecord(domainConfig.getName(), localRecord, localRecords.getKey());
                     // TODO: Logging result of zone creation
                 } else {
                     final boolean needsUpdate = checkRecord(localRecord, remoteRecord);
@@ -84,7 +86,7 @@ public class DomainRecordUpdater {
         final HashMap<Record.Type, Map<String, DnsZoneRecord>> recordsMap = new HashMap<>();
         try {
             final Responses.ZoneRecordsListResponse response = dnsimple.getZoneRecords(zoneName);
-            final List<DnsZoneRecord> zoneRecords = response.getResponseBody().getData();
+            final List<DnsZoneRecord> zoneRecords = response.getData();
             for (final DnsZoneRecord zoneRecord : zoneRecords) {
                 final Record.Type recordType = zoneRecord.getType();
                 if (!recordsMap.containsKey(recordType)) {
@@ -103,6 +105,7 @@ public class DomainRecordUpdater {
      * @return
      */
     private boolean checkRecord(final Record localRecord, final DnsZoneRecord remoteRecord) {
+        // TODO: Review this logic! The localRecord-Null-Check might be throwing this off.
         return (null != localRecord && null != remoteRecord) && remoteRecord.getContent().equals(ipAddress);
     }
 
@@ -112,8 +115,8 @@ public class DomainRecordUpdater {
      * @param localRecord
      * @return
      */
-    private boolean createZoneRecord(final String zoneName, final Record localRecord) {
-        final DnsCreateZoneRecordRequest request = new DnsCreateZoneRecordRequest(localRecord.getName(), localRecord.getType(), ipAddress);
+    private boolean createZoneRecord(final String zoneName, final Record localRecord, final Record.Type recordType) {
+        final DnsCreateZoneRecordRequest request = new DnsCreateZoneRecordRequest(localRecord.getName(), recordType, ipAddress);
         if (null != localRecord.getPriority()) {
             request.setPriority(localRecord.getPriority());
         }
