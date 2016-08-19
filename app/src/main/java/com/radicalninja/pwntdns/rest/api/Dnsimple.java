@@ -119,6 +119,11 @@ public class Dnsimple {
         return adapter.doSynchronousCall(adapter.getClient().getZoneRecords(accountId, zoneName));
     }
 
+    public Responses.CreateZoneRecordResponse createZoneRecord(
+            final String zoneName, final DnsCreateZoneRecordRequest request) {
+        return adapter.doSynchronousCall(adapter.getClient().createZoneRecord(accountId, zoneName, request));
+    }
+
     public Responses.UpdateZoneRecordResponse updateZoneRecord(final String zoneName, final int recordId,
                                                                final DnsUpdateZoneRecordRequest request) {
         return adapter.doSynchronousCall(adapter.getClient().updateZoneRecord(accountId, zoneName, recordId, request));

@@ -3,6 +3,7 @@ package com.radicalninja.pwntdns;
 import com.radicalninja.pwntdns.rest.api.Dnsimple;
 import com.radicalninja.pwntdns.rest.model.DnsZoneRecord;
 import com.radicalninja.pwntdns.rest.model.Responses;
+import com.radicalninja.pwntdns.rest.model.request.DnsCreateZoneRecordRequest;
 import com.radicalninja.pwntdns.rest.model.request.DnsUpdateZoneRecordRequest;
 
 import java.util.HashMap;
@@ -62,15 +63,15 @@ public class DomainRecordUpdater {
             final Map<String, DnsZoneRecord> remoteRecords = remoteRecordsByType.get(localRecords.getKey());
             for (final Record localRecord : localRecords.getValue()) {
                 final DnsZoneRecord remoteRecord = remoteRecords.get(localRecord.getName());
-                // If remoteRecord is null, we need to create the zone record
-                // If not, check the IP address on the record.
-                // If no match, update the record.
-                // TODO: The logic below should be broken up
-                if (null != remoteRecord) {
-                    // TODO: Logic here should be improved to allow for multiple entries in content.
-                    if (!remoteRecord.getContent().equals(ipAddress)) {
+                if (null == remoteRecord) {
+                    final boolean wasCreated = createZoneRecord(domainConfig.getName(), localRecord);
+                    // TODO: Logging result of zone creation
+                } else {
+                    final boolean needsUpdate = checkRecord(localRecord, remoteRecord);
+                    if (needsUpdate) {
                         updateZoneRecord(remoteRecord);
                     }
+                    // TODO: Logging–"Zone record is up to date"
                 }
             }
         }
@@ -92,10 +93,39 @@ public class DomainRecordUpdater {
         return recordsMap;
     }
 
-    private boolean checkRecord(final Record record, final String ipAddress) {
-        return false;
+    /**
+     * Returns true if the local and remote records do not have a matching IP address.
+     * @param localRecord
+     * @param remoteRecord
+     * @return
+     */
+    private boolean checkRecord(final Record localRecord, final DnsZoneRecord remoteRecord) {
+        return (null != localRecord && null != remoteRecord) && remoteRecord.getContent().equals(ipAddress);
     }
 
+    /**
+     * Returns true if the requested zone record is successfully created.
+     * @param zoneName
+     * @param localRecord
+     * @return
+     */
+    private boolean createZoneRecord(final String zoneName, final Record localRecord) {
+        final DnsCreateZoneRecordRequest request = new DnsCreateZoneRecordRequest(localRecord.getName(), localRecord.getType(), ipAddress);
+        if (null != localRecord.getPriority()) {
+            request.setPriority(localRecord.getPriority());
+        }
+        if (null != localRecord.getTtl()) {
+            request.setTtl(localRecord.getTtl());
+        }
+        final Responses.CreateZoneRecordResponse response = dnsimple.createZoneRecord(zoneName, request);
+        return response.isSuccess();
+    }
+
+    /**
+     * Update the given remote zone record to point at our IP address.
+     * @param dnsZoneRecord
+     * @return
+     */
     private boolean updateZoneRecord(final DnsZoneRecord dnsZoneRecord) {
         final DnsUpdateZoneRecordRequest request = new DnsUpdateZoneRecordRequest();
         request.setContent(ipAddress);
