@@ -18,6 +18,8 @@ public class PwntDns {
 
 
     public static void main(String[] args) {
+        setupDebugProxy();
+
         // Read in configuration file
         final boolean ready = loadConfig();
         // Start main task
@@ -63,6 +65,13 @@ public class PwntDns {
         final boolean updaterWasSuccessful = updater.run();
 
         System.out.println("Pwning Operation Complete.");
+    }
+
+    private static void setupDebugProxy() {
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8888");
+        System.setProperty("https.proxyHost", "127.0.0.1");
+        System.setProperty("https.proxyPort", "8888");
     }
 
 }
