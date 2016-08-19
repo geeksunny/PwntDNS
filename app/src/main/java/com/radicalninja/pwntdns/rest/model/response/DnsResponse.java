@@ -8,14 +8,14 @@ public class DnsResponse {
     private static final String ERROR_KEY = "message";
 
     @Expose
-    private String errorMessage;
+    private String error;
 
     public boolean isSuccess() {
-        return StringUtils.isEmpty(errorMessage);
+        return StringUtils.isEmpty(error);
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public String getError() {
+        return error;
     }
 
 }

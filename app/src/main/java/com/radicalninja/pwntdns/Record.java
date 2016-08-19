@@ -52,8 +52,6 @@ public class Record {
     private Integer ttl;
     @Expose
     private Integer priority;
-    @Expose
-    private Type type;
 
     public String getName() {
         return name;
@@ -77,13 +75,5 @@ public class Record {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
     }
 }
