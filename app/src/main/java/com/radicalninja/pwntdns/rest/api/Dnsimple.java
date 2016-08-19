@@ -2,20 +2,17 @@ package com.radicalninja.pwntdns.rest.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.radicalninja.pwntdns.rest.RestAdapter;
 import com.radicalninja.pwntdns.rest.model.DnsDomain;
 import com.radicalninja.pwntdns.rest.model.Responses;
 import com.radicalninja.pwntdns.rest.model.request.DnsCreateZoneRecordRequest;
 import com.radicalninja.pwntdns.rest.model.request.DnsUpdateZoneRecordRequest;
 import com.radicalninja.pwntdns.rest.model.request.DomainCreateRequest;
-import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.*;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,15 +23,10 @@ public class Dnsimple {
     private final RestAdapter<Client> adapter;
     private final String apiKey, accountId;
 
-    // TODO: Add static map data of required headers for this particular service
     // TODO: Add an interface method for adding/subtracting any headers for a given request
     private static Gson buildGsonClient() {
-        // TODO: Any Gson customization happens here.
         final GsonBuilder builder = new GsonBuilder();
-        // TODO: disable serializing nulls?
         builder.excludeFieldsWithoutExposeAnnotation();
-        final Type responseType = new TypeToken<DnsResponse<DnsResponse.ResponseModel>>(){}.getType();
-        builder.registerTypeAdapter(responseType, new DnsResponse.DnsResponseDeserializer());
         return builder.create();
     }
 
@@ -104,8 +96,8 @@ public class Dnsimple {
     public List<DnsDomain> getDomainsList() {
         final Responses.DomainsListResponse response =
                 adapter.doSynchronousCall(adapter.getClient().getDomainsList(accountId));
-        return (null != response && null != response.getResponseBody())
-                ? response.getResponseBody().getData()
+        return (null != response)
+                ? response.getData()
                 : new ArrayList<DnsDomain>();
     }
 

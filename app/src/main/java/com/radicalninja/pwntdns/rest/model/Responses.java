@@ -6,27 +6,27 @@ import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 
 public class Responses {
 
-    public static class DomainsListResponse extends DnsResponse<DnsPaginatedListResponse<DnsDomain>> { }
+    public static class DomainsListResponse extends DnsPaginatedListResponse<DnsDomain> { }
 
-    public static class CreateDomainResponse extends DnsResponse<DnsItemResponse<DnsDomain>> { }
+    public static class CreateDomainResponse extends DnsItemResponse<DnsDomain> { }
 
-    public static class GetDomainResponse extends DnsResponse<DnsItemResponse<DnsDomain>> { }
+    public static class GetDomainResponse extends DnsItemResponse<DnsDomain> { }
 
     // TODO: DeleteDomainResponse is HTTP 204
 
-    public static class ResetDomainTokenResponse extends DnsResponse<DnsItemResponse<DnsDomain>> { }
+    public static class ResetDomainTokenResponse extends DnsItemResponse<DnsDomain> { }
 
-    public static class ZonesListResponse extends DnsResponse<DnsPaginatedListResponse<DnsZone>> { }
+    public static class ZonesListResponse extends DnsPaginatedListResponse<DnsZone> { }
 
-    public static class GetZoneResponse extends DnsResponse<DnsItemResponse<DnsZone>> { }
+    public static class GetZoneResponse extends DnsItemResponse<DnsZone> { }
 
-    public static class ZoneRecordsListResponse extends DnsResponse<DnsPaginatedListResponse<DnsZoneRecord>> { }
+    public static class ZoneRecordsListResponse extends DnsPaginatedListResponse<DnsZoneRecord> { }
 
-    public static class CreateZoneRecordResponse extends DnsResponse<DnsItemResponse<DnsZoneRecord>> { }
+    public static class CreateZoneRecordResponse extends DnsItemResponse<DnsZoneRecord> { }
 
-    public static class GetZoneRecordResponse extends DnsResponse<DnsItemResponse<DnsZoneRecord>> { }
+    public static class GetZoneRecordResponse extends DnsItemResponse<DnsZoneRecord> { }
 
-    public static class UpdateZoneRecordResponse extends DnsResponse<DnsItemResponse<DnsZoneRecord>> { }
+    public static class UpdateZoneRecordResponse extends DnsItemResponse<DnsZoneRecord> { }
 
     // TODO: DeleteZoneRecordResponse is HTTP 204
 

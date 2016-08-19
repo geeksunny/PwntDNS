@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 
 import java.util.List;
 
-public class DnsItemResponse<T> implements DnsResponse.ResponseModel {
+public class DnsItemResponse<T> extends DnsResponse {
 
     @Expose
     private T data;
