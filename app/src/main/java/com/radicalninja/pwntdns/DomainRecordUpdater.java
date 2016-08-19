@@ -27,6 +27,7 @@ public class DomainRecordUpdater {
      * so the task can run sequentially from start to finish.
      */
     public boolean run() {
+//        boolean encounteredErrors = false;
         for (final Configuration.DomainConfig domain : domainConfigs) {
             final boolean domainIsReady = verifyDomain(domain.getName());
             if (domainIsReady) {
@@ -34,7 +35,8 @@ public class DomainRecordUpdater {
             }
         }
 
-        return false;
+//        return encounteredErrors;
+        return true;
     }
 
     /**
@@ -45,11 +47,12 @@ public class DomainRecordUpdater {
     private boolean verifyDomain(final String domainName) {
 
         final Responses.GetDomainResponse domainRecord = dnsimple.getDomainRecord(domainName);
-        if (null == domainRecord) {
-            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
-            return false;
-        }
-        return domainRecord.isSuccess() || createDomain(domainName);
+        throw new RuntimeException("OMG");
+//        if (null == domainRecord) {
+//            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
+//            return false;
+//        }
+//        return domainRecord.isSuccess() || createDomain(domainName);
     }
 
     private boolean createDomain(final String domainName) {

@@ -1,11 +1,11 @@
 package com.radicalninja.pwntdns.rest.model.response;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 public class DnsResponse<T extends DnsResponse.ResponseModel> {
@@ -53,9 +53,9 @@ public class DnsResponse<T extends DnsResponse.ResponseModel> {
         this.errorMessage = errorMessage;
     }
 
-    public static class DnsResponseDeserializer implements JsonDeserializer<DnsResponse> {
+    public static class DnsResponseDeserializer implements JsonDeserializer<DnsResponse<ResponseModel>> {
         @Override
-        public DnsResponse deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public DnsResponse<ResponseModel> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             // TODO: Check for "message" to return it as an error message response.
             //  otherwise, deserialize as itself.
             if (null != json) {
@@ -75,6 +75,18 @@ public class DnsResponse<T extends DnsResponse.ResponseModel> {
                 }
             }
             return new DnsResponse("Null response from server!");
+        }
+    }
+
+    public static class DnsResponseTypeAdapter extends TypeAdapter<DnsResponse<ResponseModel>> {
+        @Override
+        public void write(JsonWriter out, DnsResponse<ResponseModel> value) throws IOException {
+
+        }
+
+        @Override
+        public DnsResponse<ResponseModel> read(JsonReader in) throws IOException {
+            return null;
         }
     }
 

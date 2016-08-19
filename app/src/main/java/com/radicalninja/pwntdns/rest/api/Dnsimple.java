@@ -2,6 +2,7 @@ package com.radicalninja.pwntdns.rest.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.radicalninja.pwntdns.rest.RestAdapter;
 import com.radicalninja.pwntdns.rest.model.DnsDomain;
 import com.radicalninja.pwntdns.rest.model.Responses;
@@ -14,6 +15,7 @@ import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.*;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +33,9 @@ public class Dnsimple {
         final GsonBuilder builder = new GsonBuilder();
         // TODO: disable serializing nulls?
         builder.excludeFieldsWithoutExposeAnnotation();
-        builder.registerTypeAdapter(DnsResponse.class, new DnsResponse.DnsResponseDeserializer());
-        return new Gson();
+        final Type responseType = new TypeToken<DnsResponse<DnsResponse.ResponseModel>>(){}.getType();
+        builder.registerTypeAdapter(responseType, new DnsResponse.DnsResponseDeserializer());
+        return builder.create();
     }
 
     public Dnsimple(final String apiKey, final String accountId) {
