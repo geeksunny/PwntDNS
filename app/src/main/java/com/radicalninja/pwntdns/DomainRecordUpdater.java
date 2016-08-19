@@ -1,11 +1,11 @@
 package com.radicalninja.pwntdns;
 
 import com.radicalninja.pwntdns.rest.api.Dnsimple;
-import com.radicalninja.pwntdns.rest.model.DnsZone;
 import com.radicalninja.pwntdns.rest.model.DnsZoneRecord;
 import com.radicalninja.pwntdns.rest.model.Responses;
+import com.radicalninja.pwntdns.rest.model.request.DnsUpdateZoneRecordRequest;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,12 +13,12 @@ public class DomainRecordUpdater {
 
     private final Dnsimple dnsimple;
     private final String ipAddress;
-    private final Map<String, List<Record>> domainRecordMap;
+    private final Configuration.DomainConfigList domainConfigs;
 
-    public DomainRecordUpdater(final String ipAddress, final Map<String, List<Record>> domainRecordMap) {
+    public DomainRecordUpdater(final String ipAddress, final Configuration.DomainConfigList domainConfigs) {
         this.ipAddress = ipAddress;
-        this.domainRecordMap = domainRecordMap;
-        dnsimple = new Dnsimple();
+        this.domainConfigs = domainConfigs;
+        dnsimple = new Dnsimple(PwntDns.getApiKey(), PwntDns.getUserId());
     }
 
     /**
@@ -26,10 +26,10 @@ public class DomainRecordUpdater {
      * so the task can run sequentially from start to finish.
      */
     public boolean run() {
-        for (final Map.Entry<String, List<Record>> domain : domainRecordMap.entrySet()) {
-            final boolean domainIsReady = verifyDomain(domain.getKey());
+        for (final Configuration.DomainConfig domain : domainConfigs) {
+            final boolean domainIsReady = verifyDomain(domain.getName());
             if (domainIsReady) {
-                reviewRecords(domain.getValue());
+                reviewRecords(domain);
             }
         }
 
@@ -56,22 +56,52 @@ public class DomainRecordUpdater {
         return (null != response && response.isSuccess());
     }
 
-    private void reviewRecords(final String zoneName, final List<Record> localRecords) {
-        final List<DnsZoneRecord> remoteRecords = getRecordsForZone(zoneName);
-        for (final Record record : records) {
-
+    private void reviewRecords(final Configuration.DomainConfig domainConfig) {
+        final Map<Record.Type, Map<String, DnsZoneRecord>> remoteRecordsByType = getRecordsForZone(domainConfig.getName());
+        for (final Map.Entry<Record.Type, List<Record>> localRecords : domainConfig.getRecords().entrySet()) {
+            final Map<String, DnsZoneRecord> remoteRecords = remoteRecordsByType.get(localRecords.getKey());
+            for (final Record localRecord : localRecords.getValue()) {
+                final DnsZoneRecord remoteRecord = remoteRecords.get(localRecord.getName());
+                // If remoteRecord is null, we need to create the zone record
+                // If not, check the IP address on the record.
+                // If no match, update the record.
+                // TODO: The logic below should be broken up
+                if (null != remoteRecord) {
+                    // TODO: Logic here should be improved to allow for multiple entries in content.
+                    if (!remoteRecord.getContent().equals(ipAddress)) {
+                        updateZoneRecord(remoteRecord);
+                    }
+                }
+            }
         }
     }
 
-    private List<DnsZoneRecord> getRecordsForZone(final String zoneName) {
-        final Responses.ZoneRecordsListResponse response = dnsimple.getZoneRecords(zoneName);
-        return (null != response && null != response.getResponseBody())
-                ? response.getResponseBody().getData()
-                : new ArrayList<DnsZoneRecord>();
+    private Map<Record.Type, Map<String, DnsZoneRecord>> getRecordsForZone(final String zoneName) {
+        final HashMap<Record.Type, Map<String, DnsZoneRecord>> recordsMap = new HashMap<>();
+        try {
+            final Responses.ZoneRecordsListResponse response = dnsimple.getZoneRecords(zoneName);
+            final List<DnsZoneRecord> zoneRecords = response.getResponseBody().getData();
+            for (final DnsZoneRecord zoneRecord : zoneRecords) {
+                final Record.Type recordType = zoneRecord.getType();
+                if (!recordsMap.containsKey(recordType)) {
+                    recordsMap.put(recordType, new HashMap<String, DnsZoneRecord>());
+                }
+                recordsMap.get(recordType).put(zoneRecord.getName(), zoneRecord);
+            }
+        } catch (NullPointerException e) { }
+        return recordsMap;
     }
 
     private boolean checkRecord(final Record record, final String ipAddress) {
+        return false;
+    }
 
+    private boolean updateZoneRecord(final DnsZoneRecord dnsZoneRecord) {
+        final DnsUpdateZoneRecordRequest request = new DnsUpdateZoneRecordRequest();
+        request.setContent(ipAddress);
+        final Responses.UpdateZoneRecordResponse response =
+                dnsimple.updateZoneRecord(dnsZoneRecord.getName(), dnsZoneRecord.getId(), request);
+        return response.isSuccess();
     }
 
     /*
