@@ -2,11 +2,11 @@ package com.radicalninja.pwntdns.rest.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.radicalninja.pwntdns.PwntDns;
 import com.radicalninja.pwntdns.rest.RestAdapter;
 import com.radicalninja.pwntdns.rest.model.DnsDomain;
 import com.radicalninja.pwntdns.rest.model.Responses;
 import com.radicalninja.pwntdns.rest.model.request.DnsCreateZoneRecordRequest;
+import com.radicalninja.pwntdns.rest.model.request.DnsUpdateZoneRecordRequest;
 import com.radicalninja.pwntdns.rest.model.request.DomainCreateRequest;
 import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 import retrofit2.Call;
@@ -22,7 +22,7 @@ public class Dnsimple {
     private static final String API_URL = "https://api.dnsimple.com/v2/";
 
     private final RestAdapter<Client> adapter;
-    private final String apiKey;
+    private final String apiKey, accountId;
 
     // TODO: Add static map data of required headers for this particular service
     // TODO: Add an interface method for adding/subtracting any headers for a given request
@@ -35,8 +35,9 @@ public class Dnsimple {
         return new Gson();
     }
 
-    public Dnsimple(final String apiKey) {
+    public Dnsimple(final String apiKey, final String accountId) {
         this.apiKey = apiKey;
+        this.accountId = accountId;
         adapter = new RestAdapter<>(API_URL, Client.class, GsonConverterFactory.create(buildGsonClient()));
         setupDefaultHeaders();
     }
@@ -87,9 +88,9 @@ public class Dnsimple {
                 @Body final DnsCreateZoneRecordRequest request);
 
         @PATCH("{accountId}/zones/{zoneName}/records/{recordId}")
-        Call<Responses.CreateZoneRecordResponse> updateZoneRecord(
+        Call<Responses.UpdateZoneRecordResponse> updateZoneRecord(
                 @Path("accountId") final String accountId, @Path("zoneName") final String zoneName,
-                @Path("recordId") final int recordId, @Body final DnsCreateZoneRecordRequest request);
+                @Path("recordId") final int recordId, @Body final DnsUpdateZoneRecordRequest request);
     }
 
     /**
@@ -99,23 +100,28 @@ public class Dnsimple {
      */
     public List<DnsDomain> getDomainsList() {
         final Responses.DomainsListResponse response =
-                adapter.doSynchronousCall(adapter.getClient().getDomainsList(PwntDns.getUserId()));
+                adapter.doSynchronousCall(adapter.getClient().getDomainsList(accountId));
         return (null != response && null != response.getResponseBody())
                 ? response.getResponseBody().getData()
                 : new ArrayList<DnsDomain>();
     }
 
     public Responses.GetDomainResponse getDomainRecord(final String domainName) {
-        return adapter.doSynchronousCall(adapter.getClient().getDomain(PwntDns.getUserId(), domainName));
+        return adapter.doSynchronousCall(adapter.getClient().getDomain(accountId, domainName));
     }
 
     public Responses.CreateDomainResponse createDomain(final String domainName) {
         final DomainCreateRequest request = new DomainCreateRequest(domainName);
-        return adapter.doSynchronousCall(adapter.getClient().createDomain(PwntDns.getUserId(), request));
+        return adapter.doSynchronousCall(adapter.getClient().createDomain(accountId, request));
     }
 
     public Responses.ZoneRecordsListResponse getZoneRecords(final String zoneName) {
-        return adapter.doSynchronousCall(adapter.getClient().getZoneRecords(PwntDns.getUserId(), zoneName));
+        return adapter.doSynchronousCall(adapter.getClient().getZoneRecords(accountId, zoneName));
+    }
+
+    public Responses.UpdateZoneRecordResponse updateZoneRecord(final String zoneName, final int recordId,
+                                                               final DnsUpdateZoneRecordRequest request) {
+        return adapter.doSynchronousCall(adapter.getClient().updateZoneRecord(accountId, zoneName, recordId, request));
     }
 
 }
