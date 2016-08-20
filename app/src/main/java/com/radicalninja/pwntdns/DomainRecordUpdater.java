@@ -16,7 +16,13 @@ public class DomainRecordUpdater {
     private final String ipAddress;
     private final Configuration.DomainConfigList domainConfigs;
 
-    public DomainRecordUpdater(final String ipAddress, final Configuration.DomainConfigList domainConfigs) {
+    public DomainRecordUpdater(@Nonnull final String ipAddress,
+                               @Nonnull final Configuration.DomainConfigList domainConfigs) throws NullPointerException {
+        if (null == domainConfigs) {
+            throw new NullPointerException("DomainConfgs must not be null.");
+        } else if (StringUtils.isEmpty(ipAddress)) {
+            throw new NullPointerException("IP Address must not be empty.");
+        }
         this.ipAddress = ipAddress;
         this.domainConfigs = domainConfigs;
         dnsimple = new Dnsimple(PwntDns.getApiKey(), PwntDns.getUserId());
