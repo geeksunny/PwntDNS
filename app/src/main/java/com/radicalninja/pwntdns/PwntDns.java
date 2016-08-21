@@ -18,13 +18,12 @@ public class PwntDns {
 
 
     public static void main(String[] args) {
-        setupDebugProxy();
+        //setupDebugProxy();
 
         // Read in configuration file
         final boolean ready = loadConfig();
         // Start main task
         if (!ready) {
-            // TODO: Kill app here
             System.out.println("Error loading configuration! Exiting...");
             return;
         }

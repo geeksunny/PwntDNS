@@ -8,12 +8,12 @@ import retrofit2.http.GET;
 
 public class Ipify {
 
-    private final static String API_URL = "https://api.ipify.org?format=text";
+    private final static String API_URL = "https://api.ipify.org/";
 
     private RestAdapter<Client> adapter;
 
     private interface Client {
-        @GET(API_URL)
+        @GET("?format=text")
         Call<String> queryIpAddress();
     }
 
