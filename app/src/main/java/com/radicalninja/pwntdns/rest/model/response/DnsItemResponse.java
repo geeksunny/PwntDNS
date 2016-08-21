@@ -1,10 +1,9 @@
 package com.radicalninja.pwntdns.rest.model.response;
 
 import com.google.gson.annotations.Expose;
+import com.radicalninja.pwntdns.rest.RestResponse;
 
-import java.util.List;
-
-public class DnsItemResponse<T> extends DnsResponse {
+public class DnsItemResponse<T> implements RestResponse.ResponseBody {
 
     @Expose
     private T data;

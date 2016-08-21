@@ -1,16 +1,25 @@
 package com.radicalninja.pwntdns;
 
+import com.radicalninja.pwntdns.rest.RestResponse;
 import com.radicalninja.pwntdns.rest.api.Dnsimple;
 import com.radicalninja.pwntdns.rest.model.DnsZoneRecord;
 import com.radicalninja.pwntdns.rest.model.Responses;
 import com.radicalninja.pwntdns.rest.model.request.DnsCreateZoneRecordRequest;
 import com.radicalninja.pwntdns.rest.model.request.DnsUpdateZoneRecordRequest;
+import com.radicalninja.pwntdns.rest.model.response.DnsErrorResponse;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DomainRecordUpdater {
+
+    private enum Result {
+        PASS,
+        FAIL,
+        ERROR
+    }
 
     private final Dnsimple dnsimple;
     private final String ipAddress;
@@ -35,9 +44,11 @@ public class DomainRecordUpdater {
     public boolean run() {
 //        boolean encounteredErrors = false;
         for (final Configuration.DomainConfig domain : domainConfigs) {
-            final boolean domainIsReady = verifyDomain(domain.getName());
-            if (domainIsReady) {
+            final Result domainIsReady = verifyDomain(domain.getName());
+            if (domainIsReady.equals(Result.PASS)) {
                 reviewRecords(domain);
+            } else {
+                // TODO: Add logging here for FAIL and ERROR results.
             }
         }
 
@@ -48,20 +59,21 @@ public class DomainRecordUpdater {
     /**
      * Verify that the given domain exists on the API. If not, it will be created.
      * @param domainName The given domain name to check for.
-     * @return True if the domain exists on the API and is ready to be used. False if an error has occurred.
+     * @return TODO UPDATE–––True if the domain exists on the API and is ready to be used. False if an error has occurred.
      */
-    private boolean verifyDomain(final String domainName) {
-
-        final Responses.GetDomainResponse domainRecord = dnsimple.getDomainRecord(domainName);
-        if (null == domainRecord) {
-            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
-            return false;
-        }
-        return domainRecord.isSuccess() || createDomain(domainName);
+    private Result verifyDomain(final String domainName) {
+        final RestResponse<Responses.GetDomainResponse, DnsErrorResponse> domainRecord = dnsimple.getDomainRecord(domainName);
+        return Result.FAIL;
+//        if (null == domainRecord) {
+//            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
+//            return Result.ERROR;
+//        }
+//        return (domainRecord.isSuccess() || createDomain(domainName)) ? Result.PASS : Result.FAIL;
     }
 
     private boolean createDomain(final String domainName) {
-        final Responses.CreateDomainResponse response = dnsimple.createDomain(domainName);
+        final RestResponse<Responses.CreateDomainResponse, DnsErrorResponse> response = dnsimple.createDomain(domainName);
+        // TODO: Add logging here for failure to create a new domain record.
         return (null != response && response.isSuccess());
     }
 
@@ -75,12 +87,13 @@ public class DomainRecordUpdater {
                     remoteRecord = remoteRecords.get(localRecord.getName());
                 }
                 if (null == remoteRecord) {
-                    final boolean wasCreated = createZoneRecord(domainConfig.getName(), localRecord, localRecords.getKey());
+                    final Result wasCreated = createZoneRecord(domainConfig.getName(), localRecord, localRecords.getKey());
                     // TODO: Logging result of zone creation
                 } else {
-                    final boolean needsUpdate = checkRecord(localRecord, remoteRecord);
-                    if (needsUpdate) {
-                        updateZoneRecord(remoteRecord);
+                    final Result checkResult = checkRecord(localRecord, remoteRecord);
+                    if (checkResult.equals(Result.FAIL)) {
+                        final Result wasUpdated = updateZoneRecord(remoteRecord);
+                        // TODO: Log failure
                     }
                     // TODO: Logging–"Zone record is up to date"
                 }
@@ -91,8 +104,8 @@ public class DomainRecordUpdater {
     private Map<Record.Type, Map<String, DnsZoneRecord>> getRecordsForZone(final String zoneName) {
         final HashMap<Record.Type, Map<String, DnsZoneRecord>> recordsMap = new HashMap<>();
         try {
-            final Responses.ZoneRecordsListResponse response = dnsimple.getZoneRecords(zoneName);
-            final List<DnsZoneRecord> zoneRecords = response.getData();
+            final RestResponse<Responses.ZoneRecordsListResponse, DnsErrorResponse> response = dnsimple.getZoneRecords(zoneName);
+            final List<DnsZoneRecord> zoneRecords = response.getResponseBody().getData();
             for (final DnsZoneRecord zoneRecord : zoneRecords) {
                 final Record.Type recordType = zoneRecord.getType();
                 if (!recordsMap.containsKey(recordType)) {
@@ -105,23 +118,27 @@ public class DomainRecordUpdater {
     }
 
     /**
-     * Returns true if the local and remote records do not have a matching IP address.
+     * Check if the local and remote records do not have a matching IP address.
      * @param localRecord
      * @param remoteRecord
-     * @return
+     * @return {@code Result.PASS} if the records have matching IP addresses, {@code Result.FAIL} if not,
+     *          or {@code Result.ERROR} if either record is null.
      */
-    private boolean checkRecord(final Record localRecord, final DnsZoneRecord remoteRecord) {
-        // TODO: Review this logic! The localRecord-Null-Check might be throwing this off.
-        return (null != localRecord && null != remoteRecord) && remoteRecord.getContent().equals(ipAddress);
+    private Result checkRecord(final Record localRecord, final DnsZoneRecord remoteRecord) {
+
+        if (null == localRecord || null == remoteRecord) {
+            return Result.ERROR;
+        }
+        return (ipAddress.equals(remoteRecord.getContent())) ? Result.PASS : Result.FAIL;
     }
 
     /**
-     * Returns true if the requested zone record is successfully created.
+     * Returns {@code Result.PASS} if the requested zone record is successfully created.
      * @param zoneName
      * @param localRecord
      * @return
      */
-    private boolean createZoneRecord(final String zoneName, final Record localRecord, final Record.Type recordType) {
+    private Result createZoneRecord(final String zoneName, final Record localRecord, final Record.Type recordType) {
         final DnsCreateZoneRecordRequest request = new DnsCreateZoneRecordRequest(localRecord.getName(), recordType, ipAddress);
         if (null != localRecord.getPriority()) {
             request.setPriority(localRecord.getPriority());
@@ -129,8 +146,11 @@ public class DomainRecordUpdater {
         if (null != localRecord.getTtl()) {
             request.setTtl(localRecord.getTtl());
         }
-        final Responses.CreateZoneRecordResponse response = dnsimple.createZoneRecord(zoneName, request);
-        return response.isSuccess();
+        final RestResponse<Responses.CreateZoneRecordResponse, DnsErrorResponse> response = dnsimple.createZoneRecord(zoneName, request);
+        if (null == response) {
+            return Result.ERROR;
+        }
+        return response.isSuccess() ? Result.PASS : Result.FAIL;
     }
 
     /**
@@ -138,12 +158,15 @@ public class DomainRecordUpdater {
      * @param dnsZoneRecord
      * @return
      */
-    private boolean updateZoneRecord(final DnsZoneRecord dnsZoneRecord) {
+    private Result updateZoneRecord(final DnsZoneRecord dnsZoneRecord) {
         final DnsUpdateZoneRecordRequest request = new DnsUpdateZoneRecordRequest();
         request.setContent(ipAddress);
-        final Responses.UpdateZoneRecordResponse response =
+        final RestResponse<Responses.UpdateZoneRecordResponse, DnsErrorResponse> response =
                 dnsimple.updateZoneRecord(dnsZoneRecord.getName(), dnsZoneRecord.getId(), request);
-        return response.isSuccess();
+        if (null == response) {
+            return Result.ERROR;
+        }
+        return response.isSuccess() ? Result.PASS : Result.FAIL;
     }
 
     /*

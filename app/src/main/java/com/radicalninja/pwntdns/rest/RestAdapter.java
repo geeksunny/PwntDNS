@@ -1,9 +1,7 @@
 package com.radicalninja.pwntdns.rest;
 
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import com.google.gson.reflect.TypeToken;
+import okhttp3.*;
 import retrofit2.Call;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
@@ -15,12 +13,13 @@ import java.util.Map;
 
 public class RestAdapter<T> {
 
+    private final Retrofit retrofit;
     private final T client;
     private final Map<String, String> requiredHeaders = new HashMap<>();
     private final Object lock = new Object();
 
     public RestAdapter(final String apiServerUrl, final Class<T> clientInterface, final Converter.Factory converterFactory) {
-        final Retrofit retrofit = buildAdapter(apiServerUrl, converterFactory);
+        retrofit = buildAdapter(apiServerUrl, converterFactory);
         client = retrofit.create(clientInterface);
     }
 
@@ -77,6 +76,37 @@ public class RestAdapter<T> {
     public <RT> RT doSynchronousCall(final Call<RT> call) {
         try {
             return call.execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Simple method to synchronously make a call and return the result.
+     * The resulting {@link RestResponse} will contain either the response body
+     * or an error object depending on the response's outcome.
+     * There is no explicit error handling here other than a null response.
+     * @param call    A Call object for making your network request.
+     * @param <RT>    Your response body type class.
+     * @param <E>     Your response error type class
+     * @return
+     */
+    // TODO: This method's name doesn't make sense. Change it.
+    @Nullable
+    public <RT extends RestResponse.ResponseBody, E extends RestResponse.ResponseError> RestResponse<RT, E> doSynchronousCallWrapped(final Call<RT> call) {
+        try {
+            final retrofit2.Response<RT> response = call.execute();
+            if (response.isSuccessful()) {
+                return new RestResponse<>(response.code(), response.body());
+            } else {
+                final TypeToken<E> token = new TypeToken<E>(){};
+                // TODO: Handle IllegalArgumentException on the call below.
+                final Converter<ResponseBody, E> converter
+                        = retrofit.responseBodyConverter(token.getType(), token.getRawType().getAnnotations());
+                final E errorBody = converter.convert(response.errorBody());
+                return new RestResponse<>(response.code(), errorBody);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

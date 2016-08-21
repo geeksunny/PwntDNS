@@ -3,18 +3,16 @@ package com.radicalninja.pwntdns.rest.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.radicalninja.pwntdns.rest.RestAdapter;
-import com.radicalninja.pwntdns.rest.model.DnsDomain;
+import com.radicalninja.pwntdns.rest.RestResponse;
 import com.radicalninja.pwntdns.rest.model.Responses;
 import com.radicalninja.pwntdns.rest.model.request.DnsCreateZoneRecordRequest;
 import com.radicalninja.pwntdns.rest.model.request.DnsUpdateZoneRecordRequest;
 import com.radicalninja.pwntdns.rest.model.request.DomainCreateRequest;
+import com.radicalninja.pwntdns.rest.model.response.DnsErrorResponse;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Dnsimple {
 
@@ -93,35 +91,35 @@ public class Dnsimple {
      * // TODO: This currently does not support result pagination!!
      * @return The resulting list of domains.
      */
-    public List<DnsDomain> getDomainsList() {
-        final Responses.DomainsListResponse response =
-                adapter.doSynchronousCall(adapter.getClient().getDomainsList(accountId));
-        return (null != response)
-                ? response.getData()
-                : new ArrayList<DnsDomain>();
+//    public List<DnsDomain> getDomainsList() {
+//        final Responses.DomainsListResponse response =
+//                adapter.doSynchronousCallWrapped(adapter.getClient().getDomainsList(accountId));
+//        return (null != response)
+//                ? response.getData()
+//                : new ArrayList<DnsDomain>();
+//    }
+
+    public RestResponse<Responses.GetDomainResponse, DnsErrorResponse> getDomainRecord(final String domainName) {
+        return adapter.doSynchronousCallWrapped(adapter.getClient().getDomain(accountId, domainName));
     }
 
-    public Responses.GetDomainResponse getDomainRecord(final String domainName) {
-        return adapter.doSynchronousCall(adapter.getClient().getDomain(accountId, domainName));
-    }
-
-    public Responses.CreateDomainResponse createDomain(final String domainName) {
+    public RestResponse<Responses.CreateDomainResponse, DnsErrorResponse> createDomain(final String domainName) {
         final DomainCreateRequest request = new DomainCreateRequest(domainName);
-        return adapter.doSynchronousCall(adapter.getClient().createDomain(accountId, request));
+        return adapter.doSynchronousCallWrapped(adapter.getClient().createDomain(accountId, request));
     }
 
-    public Responses.ZoneRecordsListResponse getZoneRecords(final String zoneName) {
-        return adapter.doSynchronousCall(adapter.getClient().getZoneRecords(accountId, zoneName));
+    public RestResponse<Responses.ZoneRecordsListResponse, DnsErrorResponse> getZoneRecords(final String zoneName) {
+        return adapter.doSynchronousCallWrapped(adapter.getClient().getZoneRecords(accountId, zoneName));
     }
 
-    public Responses.CreateZoneRecordResponse createZoneRecord(
+    public RestResponse<Responses.CreateZoneRecordResponse, DnsErrorResponse> createZoneRecord(
             final String zoneName, final DnsCreateZoneRecordRequest request) {
-        return adapter.doSynchronousCall(adapter.getClient().createZoneRecord(accountId, zoneName, request));
+        return adapter.doSynchronousCallWrapped(adapter.getClient().createZoneRecord(accountId, zoneName, request));
     }
 
-    public Responses.UpdateZoneRecordResponse updateZoneRecord(final String zoneName, final int recordId,
+    public RestResponse<Responses.UpdateZoneRecordResponse, DnsErrorResponse> updateZoneRecord(final String zoneName, final int recordId,
                                                                final DnsUpdateZoneRecordRequest request) {
-        return adapter.doSynchronousCall(adapter.getClient().updateZoneRecord(accountId, zoneName, recordId, request));
+        return adapter.doSynchronousCallWrapped(adapter.getClient().updateZoneRecord(accountId, zoneName, recordId, request));
     }
 
 }

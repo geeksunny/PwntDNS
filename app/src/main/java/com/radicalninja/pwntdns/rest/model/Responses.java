@@ -2,7 +2,6 @@ package com.radicalninja.pwntdns.rest.model;
 
 import com.radicalninja.pwntdns.rest.model.response.DnsItemResponse;
 import com.radicalninja.pwntdns.rest.model.response.DnsPaginatedListResponse;
-import com.radicalninja.pwntdns.rest.model.response.DnsResponse;
 
 public class Responses {
 
