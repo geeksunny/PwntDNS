@@ -1,6 +1,5 @@
 package com.radicalninja.pwntdns.rest;
 
-import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 import retrofit2.Call;
 import retrofit2.Converter;
@@ -94,16 +93,16 @@ public class RestAdapter<T> {
      */
     // TODO: This method's name doesn't make sense. Change it.
     @Nullable
-    public <RT extends RestResponse.ResponseBody, E extends RestResponse.ResponseError> RestResponse<RT, E> doSynchronousCallWrapped(final Call<RT> call) {
+    public <RT extends RestResponse.ResponseBody, E extends RestResponse.ResponseError> RestResponse<RT, E> doSynchronousCallWrapped(final Call<RT> call, final Class<E> errorType) {
         try {
             final retrofit2.Response<RT> response = call.execute();
             if (response.isSuccessful()) {
                 return new RestResponse<>(response.code(), response.body());
             } else {
-                final TypeToken<E> token = new TypeToken<E>(){};
                 // TODO: Handle IllegalArgumentException on the call below.
                 final Converter<ResponseBody, E> converter
-                        = retrofit.responseBodyConverter(token.getType(), token.getRawType().getAnnotations());
+                        = retrofit.responseBodyConverter(errorType, errorType.getAnnotations());
+//                final String err = response.errorBody().string();
                 final E errorBody = converter.convert(response.errorBody());
                 return new RestResponse<>(response.code(), errorBody);
             }

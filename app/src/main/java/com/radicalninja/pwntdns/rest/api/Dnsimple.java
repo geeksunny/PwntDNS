@@ -100,26 +100,26 @@ public class Dnsimple {
 //    }
 
     public RestResponse<Responses.GetDomainResponse, DnsErrorResponse> getDomainRecord(final String domainName) {
-        return adapter.doSynchronousCallWrapped(adapter.getClient().getDomain(accountId, domainName));
+        return adapter.doSynchronousCallWrapped(adapter.getClient().getDomain(accountId, domainName), DnsErrorResponse.class);
     }
 
     public RestResponse<Responses.CreateDomainResponse, DnsErrorResponse> createDomain(final String domainName) {
         final DomainCreateRequest request = new DomainCreateRequest(domainName);
-        return adapter.doSynchronousCallWrapped(adapter.getClient().createDomain(accountId, request));
+        return adapter.doSynchronousCallWrapped(adapter.getClient().createDomain(accountId, request), DnsErrorResponse.class);
     }
 
     public RestResponse<Responses.ZoneRecordsListResponse, DnsErrorResponse> getZoneRecords(final String zoneName) {
-        return adapter.doSynchronousCallWrapped(adapter.getClient().getZoneRecords(accountId, zoneName));
+        return adapter.doSynchronousCallWrapped(adapter.getClient().getZoneRecords(accountId, zoneName), DnsErrorResponse.class);
     }
 
     public RestResponse<Responses.CreateZoneRecordResponse, DnsErrorResponse> createZoneRecord(
             final String zoneName, final DnsCreateZoneRecordRequest request) {
-        return adapter.doSynchronousCallWrapped(adapter.getClient().createZoneRecord(accountId, zoneName, request));
+        return adapter.doSynchronousCallWrapped(adapter.getClient().createZoneRecord(accountId, zoneName, request), DnsErrorResponse.class);
     }
 
     public RestResponse<Responses.UpdateZoneRecordResponse, DnsErrorResponse> updateZoneRecord(final String zoneName, final int recordId,
                                                                final DnsUpdateZoneRecordRequest request) {
-        return adapter.doSynchronousCallWrapped(adapter.getClient().updateZoneRecord(accountId, zoneName, recordId, request));
+        return adapter.doSynchronousCallWrapped(adapter.getClient().updateZoneRecord(accountId, zoneName, recordId, request), DnsErrorResponse.class);
     }
 
 }

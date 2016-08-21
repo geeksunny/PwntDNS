@@ -63,12 +63,11 @@ public class DomainRecordUpdater {
      */
     private Result verifyDomain(final String domainName) {
         final RestResponse<Responses.GetDomainResponse, DnsErrorResponse> domainRecord = dnsimple.getDomainRecord(domainName);
-        return Result.FAIL;
-//        if (null == domainRecord) {
-//            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
-//            return Result.ERROR;
-//        }
-//        return (domainRecord.isSuccess() || createDomain(domainName)) ? Result.PASS : Result.FAIL;
+        if (null == domainRecord) {
+            // TODO: Add logging here for the null response, meaning something is wrong with the response parsing.
+            return Result.ERROR;
+        }
+        return (domainRecord.isSuccess() || createDomain(domainName)) ? Result.PASS : Result.FAIL;
     }
 
     private boolean createDomain(final String domainName) {
@@ -92,7 +91,7 @@ public class DomainRecordUpdater {
                 } else {
                     final Result checkResult = checkRecord(localRecord, remoteRecord);
                     if (checkResult.equals(Result.FAIL)) {
-                        final Result wasUpdated = updateZoneRecord(remoteRecord);
+                        final Result wasUpdated = updateZoneRecord(domainConfig.getName(), remoteRecord);
                         // TODO: Log failure
                     }
                     // TODO: Logging–"Zone record is up to date"
@@ -158,11 +157,11 @@ public class DomainRecordUpdater {
      * @param dnsZoneRecord
      * @return
      */
-    private Result updateZoneRecord(final DnsZoneRecord dnsZoneRecord) {
+    private Result updateZoneRecord(final String zoneName, final DnsZoneRecord dnsZoneRecord) {
         final DnsUpdateZoneRecordRequest request = new DnsUpdateZoneRecordRequest();
         request.setContent(ipAddress);
         final RestResponse<Responses.UpdateZoneRecordResponse, DnsErrorResponse> response =
-                dnsimple.updateZoneRecord(dnsZoneRecord.getName(), dnsZoneRecord.getId(), request);
+                dnsimple.updateZoneRecord(zoneName, dnsZoneRecord.getId(), request);
         if (null == response) {
             return Result.ERROR;
         }
